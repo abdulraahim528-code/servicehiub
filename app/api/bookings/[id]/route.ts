@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { Service } from "@/types/service";
-import { ResultSetHeader } from "mysql2";
+import { Booking } from "@/types/booking";
+
 
 export async function GET(
   request: Request,
@@ -10,8 +10,8 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const [rows] = await pool.query<Service[]>(
-      "SELECT * FROM services WHERE id = ?",
+    const [rows] = await pool.query<Booking[]>(
+      "SELECT * FROM bookings WHERE id = ?",
       [id]
     );
 
@@ -19,7 +19,7 @@ export async function GET(
       return NextResponse.json(
         {
           success: false,
-          message: "Service not found",
+          message: "Booking not found",
         },
         { status: 404 }
       );
@@ -42,6 +42,8 @@ export async function GET(
     );
   }
 }
+import { ResultSetHeader } from "mysql2";
+
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -49,57 +51,30 @@ export async function PUT(
   try {
     const { id } = await params;
 
-    const {
-      title,
-      description,
-      category,
-      price,
-      city,
-      image,
-    } = await request.json();
+    const { status } = await request.json();
 
-    if (
-      !title ||
-      !description ||
-      !category ||
-      !price ||
-      !city ||
-      !image
-    ) {
+    if (!status) {
       return NextResponse.json(
         {
           success: false,
-          message: "All fields are required",
+          message: "Status is required",
         },
         { status: 400 }
       );
     }
-    
+
     const [result] = await pool.query<ResultSetHeader>(
-  `UPDATE services
-   SET title = ?,
-       description = ?,
-       category = ?,
-       price = ?,
-       city = ?,
-       image = ?
-   WHERE id = ?`,
-  [
-    title,
-    description,
-    category,
-    price,
-    city,
-    image,
-    id,
-  ]
-);
+      `UPDATE bookings
+       SET status = ?
+       WHERE id = ?`,
+      [status, id]
+    );
 
     if (result.affectedRows === 0) {
       return NextResponse.json(
         {
           success: false,
-          message: "Service not found",
+          message: "Booking not found",
         },
         { status: 404 }
       );
@@ -107,7 +82,7 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      message: "Service updated successfully",
+      message: "Booking updated successfully",
     });
 
   } catch (error) {
@@ -130,7 +105,7 @@ export async function DELETE(
     const { id } = await params;
 
     const [result] = await pool.query<ResultSetHeader>(
-      "DELETE FROM services WHERE id = ?",
+      "DELETE FROM bookings WHERE id = ?",
       [id]
     );
 
@@ -138,7 +113,7 @@ export async function DELETE(
       return NextResponse.json(
         {
           success: false,
-          message: "Service not found",
+          message: "Booking not found",
         },
         { status: 404 }
       );
@@ -146,7 +121,7 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: "Service deleted successfully",
+      message: "Booking deleted successfully",
     });
 
   } catch (error) {

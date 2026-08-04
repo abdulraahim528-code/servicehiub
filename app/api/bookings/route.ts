@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { Service } from "../../../types/service";
+import { Booking } from "@/types/booking";
+
 export async function GET() {
   try {
-    const [services] = await pool.query<Service[]>(
-      "SELECT * FROM services"
+    const [bookings] = await pool.query<Booking[]>(
+      "SELECT * FROM bookings"
     );
 
     return NextResponse.json({
       success: true,
-      data: services,
+      data: bookings,
     });
+
   } catch (error) {
     console.error(error);
 
@@ -28,51 +30,47 @@ import { NextRequest } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const {
-      worker_id,
-      title,
-      description,
-      category,
-      price,
-      city,
-      image,
+      customer_id,
+      service_id,
+      booking_date,
+      status,
     } = await req.json();
 
     if (
-      !worker_id ||
-      !title ||
-      !description ||
-      !category ||
-      !price ||
-      !city
+      !customer_id ||
+      !service_id ||
+      !booking_date ||
+      !status
     ) {
       return NextResponse.json(
-        { message: "All fields are required" },
+        {
+          success: false,
+          message: "All fields are required",
+        },
         { status: 400 }
       );
     }
 
     await pool.query(
-      `INSERT INTO services
-      (worker_id,title,description,category,price,city,image)
-      VALUES (?,?,?,?,?,?,?)`,
+      `INSERT INTO bookings
+      (customer_id, service_id, booking_date, status)
+      VALUES (?, ?, ?, ?)`,
       [
-        worker_id,
-        title,
-        description,
-        category,
-        price,
-        city,
-        image,
+        customer_id,
+        service_id,
+        booking_date,
+        status,
       ]
     );
 
     return NextResponse.json(
       {
         success: true,
-        message: "Service created successfully",
+        message: "Booking created successfully",
       },
       { status: 201 }
     );
+
   } catch (error) {
     console.error(error);
 
