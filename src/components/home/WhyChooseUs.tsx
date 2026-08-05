@@ -39,30 +39,33 @@ const features = [
 
 const WhyChooseUs = () => {
   return (
-    <section className="py-12">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-4xl font-bold text-slate-900 sm:text-5xl">
-          Built on trust, obsessed with quality
-        </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-base text-slate-500 sm:text-lg">
-          The details that make booking a local professional feel effortless and safe.
-        </p>
+    <section className="py-16">
+      <div className="container mx-auto px-4">
+        <div className="mb-10 text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.32em] text-slate-500">Built on trust</p>
+          <h2 className="mt-3 text-4xl font-bold text-slate-950 sm:text-5xl">
+            Obsessed with quality
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base text-slate-500 sm:text-lg">
+            The details that make booking a local professional feel effortless and reliable.
+          </p>
+        </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <motion.div
                 key={feature.title}
-                className="rounded-[2rem] border border-slate-200 bg-white p-8 text-left shadow-[0_24px_80px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-2 hover:border-sky-200 hover:shadow-[0_28px_85px_rgba(15,23,42,0.12)]"
+                className="rounded-[2rem] border border-slate-200 bg-white p-8 text-left shadow-[0_24px_80px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_85px_rgba(15,23,42,0.12)]"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.08 }}
               >
-                <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-blue-50 text-blue-600 shadow-sm">
+                <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-[#e8faf4] text-[#0aa39a] shadow-sm">
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">{feature.title}</h3>
+                <h3 className="text-xl font-semibold text-slate-950 mb-3">{feature.title}</h3>
                 <p className="text-slate-500">{feature.description}</p>
               </motion.div>
             );
