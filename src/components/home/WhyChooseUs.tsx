@@ -57,16 +57,16 @@ const WhyChooseUs = () => {
             return (
               <motion.div
                 key={feature.title}
-                className="rounded-[2rem] border border-slate-200 bg-white p-8 text-left shadow-[0_24px_80px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_85px_rgba(15,23,42,0.12)]"
+                className="group rounded-[2rem] border border-slate-200 bg-white p-8 text-left shadow-[0_24px_80px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1 hover:border-[#0aa39a] hover:shadow-[0_28px_85px_rgba(15,23,42,0.12)]"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.08 }}
               >
-                <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-[#e8faf4] text-[#0aa39a] shadow-sm">
+                <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-[#e8faf4] text-[#0aa39a] shadow-sm transition duration-300 group-hover:bg-[#0aa39a] group-hover:text-white">
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-950 mb-3">{feature.title}</h3>
-                <p className="text-slate-500">{feature.description}</p>
+                <h3 className="text-xl font-semibold text-slate-950 mb-3 group-hover:text-slate-900">{feature.title}</h3>
+                <p className="text-slate-500 group-hover:text-slate-600">{feature.description}</p>
               </motion.div>
             );
           })}

@@ -41,7 +41,7 @@ const SearchSection: React.FC = () => {
                     </select>
                     <motion.button
                         onClick={handleSearch}
-                        className="bg-accent text-white rounded-full px-6 py-3 shadow-md hover:bg-[#e85d0c] transition duration-300"
+                        className="bg-accent text-white rounded-full px-6 py-3 shadow-md hover:bg-[#ff7931] transition duration-300"
                         whileHover={{ scale: 1.05 }}
                     >
                         Search

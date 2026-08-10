@@ -1,5 +1,6 @@
 ﻿import React from 'react';
-import { CheckCircle2, Star, Clock3, MapPin } from 'lucide-react';
+import Link from 'next/link';
+import { CheckCircle2, Star } from 'lucide-react';
 
 interface Provider {
   id: string;
@@ -13,6 +14,9 @@ interface Provider {
   phone: string;
   email: string;
   rating: number;
+  price: string;
+  about: string;
+  skills: string[];
   profileImage: string;
 }
 
@@ -21,7 +25,7 @@ interface ProviderCardProps {
 }
 
 const ProviderCard: React.FC<ProviderCardProps> = ({ provider }) => {
-  const { name, profession, category, reviews, experience, location, rating, profileImage } = provider;
+  const { name, profession, reviews, experience, location, rating, profileImage, id } = provider;
 
   return (
     <div className="group relative overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 hover:shadow-[0_30px_90px_rgba(15,23,42,0.12)]">
@@ -59,9 +63,9 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider }) => {
           <button className="rounded-full bg-[#0aa39a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#089283]">
             Book now
           </button>
-          <button className="rounded-full border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
+          <Link href={`/providers/${id}`} className="inline-flex h-full items-center justify-center rounded-full border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">
             View profile
-          </button>
+          </Link>
         </div>
       </div>
     </div>

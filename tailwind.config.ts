@@ -10,7 +10,7 @@ module.exports = {
         // ServiceHub palette: navy type, teal brand, warm orange actions.
         primary: '#07877F',
         secondary: '#0B5F5B',
-        accent: '#FF6B16',
+        accent: '#FF9C56',
         background: '#F7FAFB',
         blue: {
           ...colors.teal,

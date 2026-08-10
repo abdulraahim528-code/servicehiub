@@ -1,14 +1,14 @@
 import React from 'react';
 
 const services = [
-    ['Electrician', 'Wiring, panel upgrades, lighting design and 24/7 emergency solutions.', 'From $29/hr', 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=700&q=80'],
-    ['Plumber', 'Leak repairs, drain cleaning, water heaters and full bathroom installs.', 'From $32/hr', 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&w=700&q=80'],
-    ['Painter', 'Low-VOC interior and exterior finishes with zero-clean edges.', 'From $24/hr', 'https://images.unsplash.com/photo-1562259949-a4c93f0c62b2?auto=format&fit=crop&w=700&q=80'],
-    ['Cleaner', 'Deep cleans, move-in/out resets and recurring home housekeeping.', 'From $28/hr', 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=700&q=80'],
-    ['Mechanic', 'Mobile diagnostics, brakes, servicing and pre-purchase inspections.', 'From $26/hr', 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?auto=format&fit=crop&w=700&q=80'],
-    ['Carpenter', 'Bespoke furniture, wardrobes, modular kitchens and repairs.', 'From $30/hr', 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=700&q=80'],
-    ['Home Tutor', 'Maths, science and language coaching at home or online.', 'From $22/hr', 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=700&q=80'],
-    ['AC Technician', 'Installation, gas refills, duct cleaning and same-day repairs.', 'From $40/hr', 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=700&q=80'],
+    ['Electrician', 'Wiring, panel upgrades, lighting design and 24/7 emergency solutions.', 'From ₨2,800/hr', 'https://images.unsplash.com/photo-1519741499931-7c8e904ab4c6?auto=format&fit=crop&w=700&q=80'],
+    ['Plumber', 'Leak repairs, drain clearing, water heaters and full bathroom installs.', 'From ₨2,900/hr', 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=700&q=80'],
+    ['Painter', 'Fresh interior and exterior painting with precise, clean finish work.', 'From ₨2,000/hr', 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=700&q=80'],
+    ['Cleaner', 'Deep cleans, move-in/out resets and recurring home housekeeping.', 'From ₨1,200/hr', 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=700&q=80'],
+    ['Mechanic', 'Mobile diagnostics, brakes, servicing and pre-purchase inspections.', 'From ₨2,800/hr', 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?auto=format&fit=crop&w=700&q=80'],
+    ['Carpenter', 'Bespoke furniture, wardrobes, modular kitchens and repairs.', 'From ₨2,400/hr', 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=700&q=80'],
+    ['Home Tutor', 'Maths, science and language coaching at home or online.', 'From ₨1,500/hr', 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=700&q=80'],
+    ['AC Technician', 'Installation, gas refills, duct cleaning and same-day repairs.', 'From ₨3,000/hr', 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=700&q=80'],
 ];
 
 const ServicesPage = () => {

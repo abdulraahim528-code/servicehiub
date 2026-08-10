@@ -11,6 +11,9 @@
     phone: '+91 98765 43210',
     email: 'ayesha.khan@servicehub.app',
     rating: 4.9,
+    price: '29',
+    about: 'Certified master electrician specializing in residential wiring, panel upgrades, and smart-home installations. Reliable, punctual and safety-first.',
+    skills: ['Panel Upgrades', 'Smart Home', 'Rewiring', 'Lighting', 'Diagnostics'],
     profileImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -25,6 +28,9 @@
     phone: '+1 512 555 0134',
     email: 'daniel.rivera@servicehub.app',
     rating: 4.8,
+    price: '27',
+    about: 'Trusted plumber offering leak repair, drain clearing, and water heater services for homes and commercial spaces. Clean work and clear quotes every time.',
+    skills: ['Leak Repair', 'Drain Cleaning', 'Water Heater', 'Bathroom Install', 'Pipe Replacement'],
     profileImage: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -39,6 +45,9 @@
     phone: '+1 619 555 0198',
     email: 'mei.tanaka@servicehub.app',
     rating: 5.0,
+    price: '22',
+    about: 'Experienced cleaning professional focused on move-in/out resets and regular home care. Attention to detail and gentle handling of all surfaces.',
+    skills: ['Deep Clean', 'Move-In/Out', 'Sanitization', 'Stain Removal', 'Organization'],
     profileImage: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -53,6 +62,9 @@
     phone: '+971 50 555 4321',
     email: 'omar.haddad@servicehub.app',
     rating: 4.9,
+    price: '32',
+    about: 'Professional AC technician delivering installation, maintenance, and emergency repair services with fast response and honest pricing.',
+    skills: ['Installation', 'Gas Refill', 'Duct Cleaning', 'Maintenance', 'Emergency Repair'],
     profileImage: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80',
   },
 ];

@@ -77,7 +77,7 @@ export default function AboutPage() {
             <h2 className="mt-4 max-w-md text-3xl font-extrabold leading-[1.08] tracking-tight text-[#0b5f5b] sm:text-4xl">From a broken boiler to 500+ pros</h2>
             <p className="mt-3 text-sm leading-5 text-[#52716e]">In 2021 our founders spent three days calling strangers to fix a boiler in winter. Every quote was different, no one showed credentials, and nobody arrived on time.</p>
             <p className="mt-3 text-sm leading-5 text-[#52716e]">ServiceHub started as a spreadsheet of pros we&apos;d actually recommend to a friend. Today it is a verified marketplace across 120+ cities — but the bar is still the same: would we send this person to our own home?</p>
-            <Link href="/providers" className="mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-[#e85d0c]">
+            <Link href="/providers" className="mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-[0_18px_40px_rgba(255,138,59,0.24)] transition hover:-translate-y-0.5 hover:bg-[#ff7931]">
               Meet our providers <ArrowRight size={15} />
             </Link>
           </div>
