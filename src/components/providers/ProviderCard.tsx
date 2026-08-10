@@ -1,24 +1,7 @@
 ﻿import React from 'react';
 import Link from 'next/link';
 import { CheckCircle2, Star } from 'lucide-react';
-
-interface Provider {
-  id: string;
-  name: string;
-  profession: string;
-  category: string;
-  age: number;
-  reviews: number;
-  experience: string;
-  location: string;
-  phone: string;
-  email: string;
-  rating: number;
-  price: string;
-  about: string;
-  skills: string[];
-  profileImage: string;
-}
+import type { Provider } from '@/data/providers';
 
 interface ProviderCardProps {
   provider: Provider;

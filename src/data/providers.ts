@@ -1,4 +1,23 @@
-﻿export const providersData = [
+﻿export interface Provider {
+  id: string;
+  name: string;
+  profession: string;
+  category: string;
+  age: number;
+  reviews: number;
+  experience: string;
+  location: string;
+  nationality: string;
+  phone: string;
+  email: string;
+  rating: number;
+  price: string;
+  about: string;
+  skills: string[];
+  profileImage: string;
+}
+
+export const providersData: Provider[] = [
   {
     id: '1',
     name: 'Ayesha Khan',
@@ -7,8 +26,9 @@
     age: 32,
     reviews: 342,
     experience: '8 yrs experience',
-    location: 'Bengaluru',
-    phone: '+91 98765 43210',
+    location: 'Islamabad',
+    nationality: 'Pakistani',
+    phone: '+92 301 654 3210',
     email: 'ayesha.khan@servicehub.app',
     rating: 4.9,
     price: '29',
@@ -18,35 +38,37 @@
   },
   {
     id: '2',
-    name: 'Daniel Rivera',
+    name: 'Ali Ahmed',
     profession: 'Licensed Plumber',
     category: 'Plumber',
     age: 38,
     reviews: 512,
     experience: '12 yrs experience',
-    location: 'Austin',
-    phone: '+1 512 555 0134',
-    email: 'daniel.rivera@servicehub.app',
+    location: 'Lahore',
+    nationality: 'Pakistani',
+    phone: '+92 300 555 0134',
+    email: 'ali.ahmed@servicehub.app',
     rating: 4.8,
     price: '27',
-    about: 'Trusted plumber offering leak repair, drain clearing, and water heater services for homes and commercial spaces. Clean work and clear quotes every time.',
+    about: 'Trusted Pakistani plumber offering leak repair, drain clearing, and water heater services for homes and commercial spaces. Clean work and clear quotes every time.',
     skills: ['Leak Repair', 'Drain Cleaning', 'Water Heater', 'Bathroom Install', 'Pipe Replacement'],
     profileImage: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=900&q=80',
   },
   {
     id: '3',
-    name: 'Mei Tanaka',
+    name: 'Amna Malik',
     profession: 'Deep Cleaning Pro',
     category: 'Cleaner',
     age: 29,
     reviews: 218,
     experience: '5 yrs experience',
-    location: 'San Diego',
-    phone: '+1 619 555 0198',
-    email: 'mei.tanaka@servicehub.app',
+    location: 'Karachi',
+    nationality: 'Pakistani',
+    phone: '+92 321 555 0198',
+    email: 'amna.malik@servicehub.app',
     rating: 5.0,
     price: '22',
-    about: 'Experienced cleaning professional focused on move-in/out resets and regular home care. Attention to detail and gentle handling of all surfaces.',
+    about: 'Experienced Pakistani cleaning professional focused on move-in/out resets and regular home care. Attention to detail and gentle handling of all surfaces.',
     skills: ['Deep Clean', 'Move-In/Out', 'Sanitization', 'Stain Removal', 'Organization'],
     profileImage: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80',
   },
@@ -58,8 +80,9 @@
     age: 35,
     reviews: 401,
     experience: '10 yrs experience',
-    location: 'Dubai',
-    phone: '+971 50 555 4321',
+    location: 'Multan',
+    nationality: 'Pakistani',
+    phone: '+92 321 555 4321',
     email: 'omar.haddad@servicehub.app',
     rating: 4.9,
     price: '32',

@@ -122,8 +122,8 @@ const Hero: React.FC = () => {
           >
             <div className="relative overflow-hidden rounded-[2.75rem] border-8 border-white bg-white shadow-[0_40px_120px_rgba(15,23,42,0.08)]">
               <img
-                src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1000&q=80"
-                alt="Home services illustration"
+                src="/hero-image.png"
+                alt="ServiceHub hero image"
                 className="h-[460px] w-full object-cover"
               />
               <div className="absolute left-6 top-6 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm">

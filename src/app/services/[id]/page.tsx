@@ -3,11 +3,12 @@ import { servicesData } from '../../../data/services';
 import ServiceCard from '../../../components/services/ServiceCard';
 
 interface ServiceDetailPageProps {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
-const ServiceDetailPage = ({ params }: ServiceDetailPageProps) => {
-    const service = servicesData.find((service) => service.id.toString() === params.id);
+const ServiceDetailPage = async ({ params }: ServiceDetailPageProps) => {
+    const { id } = await params;
+    const service = servicesData.find((service) => service.id.toString() === id);
 
     if (!service) {
         notFound();

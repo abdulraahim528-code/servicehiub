@@ -6,5 +6,6 @@ export interface Booking extends RowDataPacket {
   service_id: number;
   booking_date: Date;
   status: "Pending" | "Accepted" | "Completed" | "Cancelled";
+  house_details?: string;
   created_at: Date;
 }

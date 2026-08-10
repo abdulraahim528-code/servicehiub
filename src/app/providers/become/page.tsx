@@ -6,12 +6,18 @@ import { useRouter } from 'next/navigation';
 const BecomeProviderPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [whatsapp, setWhatsapp] = useState('');
+  const defaultPakPhone = '+92 000000000';
+  const [phone, setPhone] = useState(defaultPakPhone);
+  const [whatsapp, setWhatsapp] = useState(defaultPakPhone);
   const [category, setCategory] = useState('');
   const [city, setCity] = useState('');
   const [years, setYears] = useState('');
   const [description, setDescription] = useState('');
+
+  const formatPakPhone = (value: string) => {
+    const digits = value.replace(/\D/g, '').replace(/^92/, '').slice(0, 9);
+    return `+92 ${digits.padEnd(9, '0')}`;
+  };
   const router = useRouter();
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,18 +63,18 @@ const BecomeProviderPage: React.FC = () => {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700">Full name</label>
-                  <input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Alex Johnson" className="mt-3 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-3 focus:border-[#0aa39a] focus:ring-2 focus:ring-[#0aa39a]/10" />
+                  <input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="" className="mt-3 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-3 focus:border-[#0aa39a] focus:ring-2 focus:ring-[#0aa39a]/10" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700">Phone number</label>
-                  <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 555 000 0000" className="mt-3 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-3 focus:border-[#0aa39a] focus:ring-2 focus:ring-[#0aa39a]/10" />
+                  <input value={phone} onChange={e => setPhone(formatPakPhone(e.target.value))} placeholder="+92 000000000" className="mt-3 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-3 focus:border-[#0aa39a] focus:ring-2 focus:ring-[#0aa39a]/10" />
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700">WhatsApp number</label>
-                  <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="+1 555 000 0000" className="mt-3 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-3 focus:border-[#0aa39a] focus:ring-2 focus:ring-[#0aa39a]/10" />
+                  <input value={whatsapp} onChange={e => setWhatsapp(formatPakPhone(e.target.value))} placeholder="+92 000000000" className="mt-3 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-3 focus:border-[#0aa39a] focus:ring-2 focus:ring-[#0aa39a]/10" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700">Service category</label>
