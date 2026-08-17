@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { categories as localCategories } from "../../../data/services";
 import { useRouter } from "next/navigation";
 
 interface ServiceOption {
-  id: number;
+  id: number | string;
   name: string;
-  slug: string;
+  slug?: string;
 }
 
 const BecomeProviderPage: React.FC = () => {
@@ -25,16 +26,72 @@ const BecomeProviderPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [services, setServices] = useState<ServiceOption[]>([]);
+  const [services, setServices] = useState<ServiceOption[]>(
+    () =>
+      (localCategories || []).map((c: any) => ({ id: c.id, name: c.title, slug: c.id }))
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetch("/api/services")
-      .then((res) => res.json())
-      .then((data) => setServices(data.data || []))
-      .catch((err) => console.error("Failed to load services:", err));
+    async function loadServices() {
+      // Pre-populate from local categories so UI shows options immediately
+      try {
+        const modInit = await import("../../../data/services");
+        const initCats = modInit.categories || [];
+        const initMapped = initCats.map((c: any) => ({ id: c.id, name: c.title, slug: c.id }));
+        setServices(initMapped);
+      } catch (e) {
+        // ignore
+      }
+
+      try {
+        const res = await fetch("/api/services");
+        const data = await res.json();
+
+        let items = data?.data || [];
+
+        // Normalize rows from the DB (some seeds use `title` instead of `name`)
+        if (Array.isArray(items) && items.length > 0) {
+          const mapped = items.map((s: any) => ({
+            id: s.id ?? s._id ?? s.slug ?? s.title,
+            name: s.name ?? s.title ?? String(s.slug ?? s.id),
+            slug: s.slug ?? String(s.title ?? s.name ?? "").toLowerCase().replace(/\s+/g, "-"),
+          }));
+
+          setServices(mapped);
+          return;
+        }
+
+        // Fallback to local categories if the API returns no rows
+        const mod = await import("../../../data/services");
+        const localCats = mod.categories || [];
+        const mappedLocal = localCats.map((c: any) => ({
+          id: c.id,
+          name: c.title,
+          slug: c.id,
+        }));
+
+        setServices(mappedLocal);
+      } catch (err) {
+        console.error("Failed to load services:", err);
+        try {
+          const mod = await import("../../../data/services");
+          const localCats = mod.categories || [];
+          const mappedLocal = localCats.map((c: any) => ({
+            id: c.id,
+            name: c.title,
+            slug: c.id,
+          }));
+          setServices(mappedLocal);
+        } catch (e) {
+          setServices([]);
+        }
+      }
+    }
+
+    loadServices();
   }, []);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -321,6 +378,8 @@ const BecomeProviderPage: React.FC = () => {
                     ))}
 
                   </select>
+
+                    {/* categories are loaded from local data or API */}
 
                 </div>
 
