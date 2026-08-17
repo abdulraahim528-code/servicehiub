@@ -7,10 +7,11 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
+      message: "MySQL connection successful",
       data: rows,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Database connection error:", error);
 
     return NextResponse.json(
       {

@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm, type SubmitHandler } from "react-hook-form";
+
 
 interface LoginFormValues {
   email: string;
@@ -9,10 +12,44 @@ interface LoginFormValues {
 }
 
 const LoginPage = () => {
+  const router = useRouter();
   const { register, handleSubmit } = useForm<LoginFormValues>();
 
-  const onSubmit: SubmitHandler<LoginFormValues> = (data) => {
-    console.log(data);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
+    setError("");
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setError(result.message || "Invalid email or password.");
+        return;
+      }
+
+      // Redirect based on role
+      if (result.user?.role === "provider") {
+        router.push("/providers/dashboard");
+      } else {
+        router.push("/");
+      }
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -135,11 +172,18 @@ const LoginPage = () => {
                 </Link>
               </div>
 
+              {error && (
+                <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {error}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full rounded-[1.75rem] bg-[#0aa39a] px-6 py-3 text-base font-semibold text-white shadow-[0_18px_40px_rgba(10,163,154,0.25)] transition hover:bg-[#0a8a7b]"
+                disabled={loading}
+                className="w-full rounded-[1.75rem] bg-[#0aa39a] px-6 py-3 text-base font-semibold text-white shadow-[0_18px_40px_rgba(10,163,154,0.25)] transition hover:bg-[#0a8a7b] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Log in
+                {loading ? "Logging in..." : "Log in"}
               </button>
             </form>
 
