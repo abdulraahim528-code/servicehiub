@@ -10,6 +10,26 @@ interface ServiceOption {
   slug?: string;
 }
 
+// Shape of items coming from src/data/services.ts `categories`
+interface LocalCategory {
+  id: string;
+  title: string;
+  icon?: string;
+  serviceCount?: number;
+}
+
+// Loosely-typed shape of a row coming back from /api/services
+interface ApiServiceRow {
+  id?: number | string;
+  _id?: number | string;
+  slug?: string;
+  name?: string;
+  title?: string;
+}
+
+const mapLocalCategories = (cats: LocalCategory[]): ServiceOption[] =>
+  cats.map((c) => ({ id: c.id, name: c.title, slug: c.id }));
+
 const BecomeProviderPage: React.FC = () => {
   const router = useRouter();
 
@@ -19,45 +39,53 @@ const BecomeProviderPage: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-  const [category, setCategory] = useState(""); // holds service id as string
+  const [selectedServices, setSelectedServices] = useState<string[]>([]); // holds service ids as strings
   const [city, setCity] = useState("");
   const [years, setYears] = useState("");
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [services, setServices] = useState<ServiceOption[]>(
-    () =>
-      (localCategories || []).map((c: any) => ({ id: c.id, name: c.title, slug: c.id }))
+  const [services, setServices] = useState<ServiceOption[]>(() =>
+    mapLocalCategories((localCategories as LocalCategory[]) || [])
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+
+  const toggleService = (id: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    );
+  };
 
   useEffect(() => {
     async function loadServices() {
       // Pre-populate from local categories so UI shows options immediately
       try {
         const modInit = await import("../../../data/services");
-        const initCats = modInit.categories || [];
-        const initMapped = initCats.map((c: any) => ({ id: c.id, name: c.title, slug: c.id }));
-        setServices(initMapped);
-      } catch (e) {
-        // ignore
+        const initCats = (modInit.categories as LocalCategory[]) || [];
+        setServices(mapLocalCategories(initCats));
+      } catch {
+        // ignore — fall through to fetch from the API below
       }
 
       try {
         const res = await fetch("/api/services");
         const data = await res.json();
 
-        let items = data?.data || [];
+        const items: ApiServiceRow[] = data?.data || [];
 
         // Normalize rows from the DB (some seeds use `title` instead of `name`)
         if (Array.isArray(items) && items.length > 0) {
-          const mapped = items.map((s: any) => ({
-            id: s.id ?? s._id ?? s.slug ?? s.title,
-            name: s.name ?? s.title ?? String(s.slug ?? s.id),
-            slug: s.slug ?? String(s.title ?? s.name ?? "").toLowerCase().replace(/\s+/g, "-"),
+          const mapped: ServiceOption[] = items.map((s) => ({
+            id: s.id ?? s._id ?? s.slug ?? s.title ?? "",
+            name: s.name ?? s.title ?? String(s.slug ?? s.id ?? ""),
+            slug:
+              s.slug ??
+              String(s.title ?? s.name ?? "")
+                .toLowerCase()
+                .replace(/\s+/g, "-"),
           }));
 
           setServices(mapped);
@@ -66,26 +94,15 @@ const BecomeProviderPage: React.FC = () => {
 
         // Fallback to local categories if the API returns no rows
         const mod = await import("../../../data/services");
-        const localCats = mod.categories || [];
-        const mappedLocal = localCats.map((c: any) => ({
-          id: c.id,
-          name: c.title,
-          slug: c.id,
-        }));
-
-        setServices(mappedLocal);
+        const localCats = (mod.categories as LocalCategory[]) || [];
+        setServices(mapLocalCategories(localCats));
       } catch (err) {
         console.error("Failed to load services:", err);
         try {
           const mod = await import("../../../data/services");
-          const localCats = mod.categories || [];
-          const mappedLocal = localCats.map((c: any) => ({
-            id: c.id,
-            name: c.title,
-            slug: c.id,
-          }));
-          setServices(mappedLocal);
-        } catch (e) {
+          const localCats = (mod.categories as LocalCategory[]) || [];
+          setServices(mapLocalCategories(localCats));
+        } catch {
           setServices([]);
         }
       }
@@ -124,13 +141,13 @@ const BecomeProviderPage: React.FC = () => {
       !fullName ||
       !phone ||
       !email ||
-      !category ||
+      selectedServices.length === 0 ||
       !city ||
       !years ||
       !password ||
       !confirmPassword
     ) {
-      setError("Please fill in all required fields.");
+      setError("Please fill in all required fields and select at least one service.");
       return;
     }
 
@@ -148,7 +165,7 @@ const BecomeProviderPage: React.FC = () => {
     formData.append("fullName", fullName);
     formData.append("phone", phone);
     formData.append("email", email);
-    formData.append("serviceId", category);
+    selectedServices.forEach((id) => formData.append("serviceIds", id));
     formData.append("city", city);
     formData.append("years", years);
     formData.append("password", password);
@@ -349,86 +366,89 @@ const BecomeProviderPage: React.FC = () => {
 
 
               {/* =================================
-                  SERVICE CATEGORY + CITY
+                  SERVICE CATEGORIES (multi-select)
               ================================== */}
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div>
 
-                {/* Service Category — now loaded from the database */}
-                <div>
+                <label className="block text-sm font-semibold text-slate-700">
+                  Service categories (select one or more)
+                </label>
 
-                  <label className="block text-sm font-semibold text-slate-700">
-                    Service category
-                  </label>
-
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    required
-                    className="mt-3 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-3 outline-none transition focus:border-[#0aa39a] focus:ring-2 focus:ring-[#0aa39a]/10"
-                  >
-
-                    <option value="">
-                      Select...
-                    </option>
-
-                    {services.map((service) => (
-                      <option key={service.id} value={service.id}>
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {services.map((service) => {
+                    const idStr = String(service.id);
+                    const checked = selectedServices.includes(idStr);
+                    return (
+                      <label
+                        key={service.id}
+                        className={`flex cursor-pointer items-center gap-2 rounded-2xl border px-3 py-2.5 text-sm transition ${
+                          checked
+                            ? "border-[#0aa39a] bg-[#eaf7f6] text-[#0a6d5a] font-semibold"
+                            : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleService(idStr)}
+                          className="h-4 w-4 accent-[#0aa39a]"
+                        />
                         {service.name}
-                      </option>
-                    ))}
-
-                  </select>
-
-                    {/* categories are loaded from local data or API */}
-
+                      </label>
+                    );
+                  })}
                 </div>
 
+                {/* categories are loaded from local data or API */}
 
-                {/* City */}
-                <div>
+              </div>
 
-                  <label className="block text-sm font-semibold text-slate-700">
-                    City
-                  </label>
 
-                  <select
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    required
-                    className="mt-3 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-3 outline-none transition focus:border-[#0aa39a] focus:ring-2 focus:ring-[#0aa39a]/10"
-                  >
+              {/* =================================
+                  CITY
+              ================================== */}
+              <div>
 
-                    <option value="">
-                      Select...
-                    </option>
+                <label className="block text-sm font-semibold text-slate-700">
+                  City
+                </label>
 
-                    <option value="Islamabad">
-                      Islamabad
-                    </option>
+                <select
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                  className="mt-3 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-3 outline-none transition focus:border-[#0aa39a] focus:ring-2 focus:ring-[#0aa39a]/10"
+                >
 
-                    <option value="Rawalpindi">
-                      Rawalpindi
-                    </option>
+                  <option value="">
+                    Select...
+                  </option>
 
-                    <option value="Lahore">
-                      Lahore
-                    </option>
+                  <option value="Islamabad">
+                    Islamabad
+                  </option>
 
-                    <option value="Karachi">
-                      Karachi
-                    </option>
+                  <option value="Rawalpindi">
+                    Rawalpindi
+                  </option>
 
-                    <option value="Peshawar">
-                      Peshawar
-                    </option>
+                  <option value="Lahore">
+                    Lahore
+                  </option>
 
-                    <option value="Multan">
-                      Multan
-                    </option>
+                  <option value="Karachi">
+                    Karachi
+                  </option>
 
-                  </select>
+                  <option value="Peshawar">
+                    Peshawar
+                  </option>
 
-                </div>
+                  <option value="Multan">
+                    Multan
+                  </option>
+
+                </select>
 
               </div>
 

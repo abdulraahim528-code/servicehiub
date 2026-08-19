@@ -16,14 +16,14 @@ export async function POST(req: NextRequest) {
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
     const password = formData.get("password") as string;
-    const serviceId = formData.get("serviceId") as string;
+    const serviceIds = formData.getAll("serviceIds").map(String).filter(Boolean);
     const city = formData.get("city") as string;
     const years = formData.get("years") as string;
     const file = formData.get("file") as File | null;
 
-    if (!fullName || !email || !phone || !password || !serviceId || !city || !years) {
+    if (!fullName || !email || !phone || !password || serviceIds.length === 0 || !city || !years) {
       return NextResponse.json(
-        { message: "All fields are required" },
+        { message: "All fields are required, and at least one service must be selected" },
         { status: 400 }
       );
     }
@@ -63,9 +63,18 @@ export async function POST(req: NextRequest) {
     );
     const userId = result.insertId;
 
+    const [providerResult] = await conn.query<ResultSetHeader>(
+      "INSERT INTO providers (user_id, city, years_experience, profile_picture) VALUES (?, ?, ?, ?)",
+      [userId, city, years, imagePath]
+    );
+    const providerId = providerResult.insertId;
+
+    // One row per selected service (deduplicated in case of a repeated checkbox value)
+    const uniqueServiceIds = Array.from(new Set(serviceIds));
+    const values = uniqueServiceIds.map((id) => [providerId, id]);
     await conn.query(
-      "INSERT INTO providers (user_id, service_id, city, years_experience, profile_picture) VALUES (?, ?, ?, ?, ?)",
-      [userId, serviceId, city, years, imagePath]
+      "INSERT INTO provider_services (provider_id, service_id) VALUES ?",
+      [values]
     );
 
     await conn.commit();

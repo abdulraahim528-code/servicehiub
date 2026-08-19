@@ -14,7 +14,7 @@ interface ProviderApiRow {
   reviews_count: number;
   verified: number;
   profile_picture: string | null;
-  service_name: string;
+  service_names: string;
 }
 
 interface MappedProvider {
@@ -47,8 +47,8 @@ const FeaturedProviders: React.FC = () => {
         const mapped: MappedProvider[] = rows.map((p) => ({
           id: String(p.id),
           name: p.full_name,
-          profession: p.service_name,
-          category: p.service_name,
+          profession: p.service_names,
+          category: p.service_names,
           age: 0,
           reviews: p.reviews_count,
           experience: `${p.years_experience} yrs experience`,

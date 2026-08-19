@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
-
 interface LoginFormValues {
   email: string;
   password: string;
@@ -41,7 +40,7 @@ const LoginPage = () => {
       if (result.user?.role === "provider") {
         router.push("/providers/dashboard");
       } else {
-        router.push("/");
+        router.push("/customer/dashboard");
       }
       router.refresh();
     } catch (err) {
@@ -56,6 +55,7 @@ const LoginPage = () => {
     <div className="min-h-screen bg-[radial-gradient(circle_at_7%_5%,_rgba(51,154,143,0.24),_transparent_36%),radial-gradient(circle_at_89%_11%,_rgba(255,190,78,0.24),_transparent_35%),linear-gradient(112deg,_#c4e2dc_0%,_#e7f1ee_39%,_#fff0cf_77%,_#f9fbfa_100%)] py-16">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto px-8 grid gap-12 items-stretch lg:grid-cols-2">
+          {/* Left panel */}
           <div className="h-full rounded-[2.5rem] bg-gradient-to-br from-[#0aa39a] via-[#109a8c] to-[#0a6d9a] p-10 text-white shadow-[0_45px_120px_rgba(10,163,154,0.16)]">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 shadow-sm shadow-slate-950/10">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-slate-100">★</span>
@@ -70,21 +70,15 @@ const LoginPage = () => {
 
             <div className="mt-8 space-y-4">
               <div className="flex items-center gap-3 rounded-3xl bg-white/10 p-4 shadow-sm">
-                <div className="flex h-11 w-11 items-center justify-center rounded-3xl bg-white/15 text-white shadow-lg shadow-slate-950/20">
-                  ✓
-                </div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-3xl bg-white/15 text-white shadow-lg shadow-slate-950/20">✓</div>
                 <p className="text-sm font-semibold text-slate-100">Verified professionals in every category</p>
               </div>
               <div className="flex items-center gap-3 rounded-3xl bg-white/10 p-4 shadow-sm">
-                <div className="flex h-11 w-11 items-center justify-center rounded-3xl bg-white/15 text-white shadow-lg shadow-slate-950/20">
-                  ★
-                </div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-3xl bg-white/15 text-white shadow-lg shadow-slate-950/20">★</div>
                 <p className="text-sm font-semibold text-slate-100">4.9 average rating across 500k reviews</p>
               </div>
               <div className="flex items-center gap-3 rounded-3xl bg-white/10 p-4 shadow-sm">
-                <div className="flex h-11 w-11 items-center justify-center rounded-3xl bg-white/15 text-white shadow-lg shadow-slate-950/20">
-                  🔒
-                </div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-3xl bg-white/15 text-white shadow-lg shadow-slate-950/20">🔒</div>
                 <p className="text-sm font-semibold text-slate-100">Secure contact and protected bookings</p>
               </div>
             </div>
@@ -105,6 +99,7 @@ const LoginPage = () => {
             </div>
           </div>
 
+          {/* Right panel — form */}
           <div className="h-full rounded-[2.5rem] bg-white p-10 shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
             <div className="mb-6">
               <div className="inline-flex items-center rounded-full bg-[#eaf7ee] px-4 py-2 text-sm font-semibold text-[#0aa39a]">
@@ -112,7 +107,7 @@ const LoginPage = () => {
               </div>
               <h2 className="mt-6 text-3xl font-bold text-slate-950">Access your ServiceHub account</h2>
               <p className="mt-2 text-sm text-slate-500">
-                New here?{' '}
+                New here?{" "}
                 <Link href="/register" className="font-semibold text-[#0aa39a] hover:text-[#0a8a7b]">
                   Create an account
                 </Link>
@@ -134,7 +129,7 @@ const LoginPage = () => {
                   <input
                     id="email"
                     type="email"
-                    {...register('email', { required: true })}
+                    {...register("email", { required: true })}
                     placeholder="you@email.com"
                     className="w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-4 py-3 pl-12 text-slate-900 placeholder:text-slate-400 focus:border-[#0aa39a] focus:outline-none focus:ring-2 focus:ring-[#0aa39a]/10"
                   />
@@ -155,7 +150,7 @@ const LoginPage = () => {
                   <input
                     id="password"
                     type="password"
-                    {...register('password', { required: true })}
+                    {...register("password", { required: true })}
                     placeholder="••••••••"
                     className="w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-4 py-3 pl-12 text-slate-900 placeholder:text-slate-400 focus:border-[#0aa39a] focus:outline-none focus:ring-2 focus:ring-[#0aa39a]/10"
                   />
@@ -173,9 +168,7 @@ const LoginPage = () => {
               </div>
 
               {error && (
-                <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
-                  {error}
-                </div>
+                <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
               )}
 
               <button
@@ -188,15 +181,10 @@ const LoginPage = () => {
             </form>
 
             <p className="mt-6 text-center text-sm text-slate-500">
-              By continuing you agree to our{' '}
-              <Link href="/terms" className="font-semibold text-slate-900 hover:text-slate-700">
-                Terms
-              </Link>{' '}
-              and{' '}
-              <Link href="/privacy" className="font-semibold text-slate-900 hover:text-slate-700">
-                Privacy Policy
-              </Link>
-              .
+              By continuing you agree to our{" "}
+              <Link href="/terms" className="font-semibold text-slate-900 hover:text-slate-700">Terms</Link>
+              {" "}and{" "}
+              <Link href="/privacy" className="font-semibold text-slate-900 hover:text-slate-700">Privacy Policy</Link>.
             </p>
           </div>
         </div>

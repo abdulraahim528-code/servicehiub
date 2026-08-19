@@ -9,5 +9,6 @@ export interface ProviderRow extends RowDataPacket {
   reviews_count: number;
   verified: number;
   profile_picture: string | null;
-  service_name: string;
+  service_ids: string;   // comma-separated, e.g. "1,7"
+  service_names: string; // comma-separated, e.g. "Electrician, Home Tutor"
 }
