@@ -209,17 +209,12 @@ const ProvidersPage = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <button className="rounded-full bg-[#0aa39a] py-2.5 text-center text-sm font-semibold text-white transition hover:bg-[#089283]">
-                      Book Now
-                    </button>
-                    <Link
-                      href={`/providers/${p.id}`}
-                      className="inline-flex items-center justify-center rounded-full border border-slate-200 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
-                    >
-                      View Profile
-                    </Link>
-                  </div>
+                  <Link
+                    href={`/providers/${p.id}`}
+                    className="block w-full rounded-full bg-[#0aa39a] py-2.5 text-center text-sm font-semibold text-white transition hover:bg-[#089283]"
+                  >
+                    View Profile
+                  </Link>
                 </div>
               </div>
             ))}

@@ -21,7 +21,7 @@ interface ProviderApiRow {
   reviews_count: number;
   verified: number;
   profile_picture: string | null;
-  service_name: string;
+  service_names: string; // comma-separated, e.g. "Electrician, Plumber"
 }
 
 interface Service {
@@ -78,13 +78,18 @@ const CustomerDashboard = () => {
       .finally(() => setLoading(false));
   }, [user]);
 
+  // A provider can offer multiple services now (provider_services table),
+  // so service_names is a comma-separated list — split it to check membership.
+  const getServiceList = (p: ProviderApiRow) => p.service_names.split(", ");
+
   const filteredProviders = providers.filter((p) => {
-    const matchesCategory = activeCategory === "All" || p.service_name === activeCategory;
+    const matchesCategory =
+      activeCategory === "All" || getServiceList(p).includes(activeCategory);
     const matchesSearch =
       search === "" ||
       p.full_name.toLowerCase().includes(search.toLowerCase()) ||
       p.city.toLowerCase().includes(search.toLowerCase()) ||
-      p.service_name.toLowerCase().includes(search.toLowerCase());
+      p.service_names.toLowerCase().includes(search.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -195,10 +200,17 @@ const CustomerDashboard = () => {
                 </div>
 
                 <div className="space-y-3 p-5">
-                  {/* Category badge */}
-                  <span className="inline-block rounded-full bg-[#eaf7f6] px-3 py-1 text-xs font-semibold text-[#0aa39a]">
-                    {serviceIcons[p.service_name] ?? "🛠️"} {p.service_name}
-                  </span>
+                  {/* Category badges (a provider can offer more than one service) */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {getServiceList(p).map((name) => (
+                      <span
+                        key={name}
+                        className="inline-block rounded-full bg-[#eaf7f6] px-3 py-1 text-xs font-semibold text-[#0aa39a]"
+                      >
+                        {serviceIcons[name] ?? "🛠️"} {name}
+                      </span>
+                    ))}
+                  </div>
 
                   <div>
                     <h3 className="text-lg font-bold text-slate-950">{p.full_name}</h3>
