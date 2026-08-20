@@ -1,8 +1,8 @@
 import React from 'react';
 
 const services = [
-    ['Electrician', 'Wiring, panel upgrades, lighting design and 24/7 emergency solutions.', 'From ₨2,800/hr', 'https://images.unsplash.com/photo-1519741499931-7c8e904ab4c6?auto=format&fit=crop&w=700&q=80'],
-    ['Plumber', 'Leak repairs, drain clearing, water heaters and full bathroom installs.', 'From ₨2,900/hr', 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=700&q=80'],
+    ['Electrician', 'Wiring, panel upgrades, lighting design and 24/7 emergency solutions.', 'From ₨2,800/hr', '/images/electrician.jpg'],
+    ['Plumber', 'Leak repairs, drain clearing, water heaters and full bathroom installs.', 'From ₨2,900/hr', '/images/plumber.jpeg'],
     ['Painter', 'Fresh interior and exterior painting with precise, clean finish work.', 'From ₨2,000/hr', 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=700&q=80'],
     ['Cleaner', 'Deep cleans, move-in/out resets and recurring home housekeeping.', 'From ₨1,200/hr', 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=700&q=80'],
     ['Mechanic', 'Mobile diagnostics, brakes, servicing and pre-purchase inspections.', 'From ₨2,800/hr', 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?auto=format&fit=crop&w=700&q=80'],
