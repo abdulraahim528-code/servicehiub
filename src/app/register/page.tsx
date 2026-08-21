@@ -161,7 +161,7 @@ const RegisterPage = () => {
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="h-full rounded-[2.5rem] bg-white p-10 shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
+        <div className="h-full flex flex-col justify-center rounded-[2.5rem] bg-white p-10 shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
 
           <div className="mb-6">
 

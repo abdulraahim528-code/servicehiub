@@ -1,5 +1,7 @@
 ﻿import React from 'react';
 import Link from 'next/link';
+
+import Image from 'next/image'
 import { CheckCircle2, Star } from 'lucide-react';
 
 interface Provider {
@@ -29,8 +31,8 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider }) => {
 
   return (
     <div className="group relative overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 hover:shadow-[0_30px_90px_rgba(15,23,42,0.12)]">
-      <div className="relative overflow-hidden rounded-t-[2rem]">
-        <img src={profileImage} alt={name} className="h-72 w-full object-cover"/>
+      <div className="relative h-72 overflow-hidden rounded-t-[2rem]">
+        <Image src={profileImage} alt={name} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
         <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm">
           <CheckCircle2 className="h-4 w-4 text-[#0aa39a]" />
           Verified
@@ -59,6 +61,9 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider }) => {
           </div>
         </div>
 
+        {/* Homepage is public (no login) — only "View profile" here.
+            Booking is only offered once the visitor is signed in as a customer,
+            from the provider's own profile page or the customer dashboard. */}
         <Link
           href={`/providers/${id}`}
           className="inline-flex w-full items-center justify-center rounded-full bg-[#0aa39a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#089283]"

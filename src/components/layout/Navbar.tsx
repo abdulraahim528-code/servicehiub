@@ -15,7 +15,7 @@ interface AuthUser {
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  
 ];
 
 const Navbar = () => {

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Star, MapPin, Briefcase, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Star, MapPin, Briefcase, CheckCircle2, ArrowLeft, CalendarDays, Lock } from "lucide-react";
 
 interface ProviderDetail {
   provider_id: number;
@@ -21,6 +21,13 @@ interface ProviderDetail {
   services: { id: number; name: string }[];
 }
 
+interface AuthUser {
+  id: number;
+  name: string;
+  email: string;
+  role: "customer" | "provider";
+}
+
 const serviceIcons: Record<string, string> = {
   Electrician: "⚡",
   Plumber: "🔧",
@@ -32,13 +39,27 @@ const serviceIcons: Record<string, string> = {
   "AC Technician": "❄️",
 };
 
-const ProviderDetailPage = () => {
+const ProviderDetailContent = () => {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [provider, setProvider] = useState<ProviderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFoundState, setNotFoundState] = useState(false);
+
+  // Auth state — determines whether booking is even possible here
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  // Booking form state
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState("");
+  const [bookingDate, setBookingDate] = useState("");
+  const [houseDetails, setHouseDetails] = useState("");
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [bookingError, setBookingError] = useState("");
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   useEffect(() => {
     if (!params?.id) return;
@@ -51,10 +72,64 @@ const ProviderDetailPage = () => {
           return;
         }
         setProvider(data.data);
+        if (data.data.services?.length > 0) {
+          setSelectedServiceId(String(data.data.services[0].id));
+        }
       })
       .catch(() => setNotFoundState(true))
       .finally(() => setLoading(false));
   }, [params?.id]);
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setUser(data?.success ? data.user : null))
+      .catch(() => setUser(null))
+      .finally(() => setAuthChecked(true));
+  }, []);
+
+  // Auto-open the booking form when arriving via a "Book Now" link (?book=1),
+  // but only once we know the visitor is actually a logged-in customer.
+  useEffect(() => {
+    if (authChecked && user?.role === "customer" && searchParams.get("book") === "1") {
+      const t = setTimeout(() => setShowBookingForm(true), 0);
+      return () => clearTimeout(t);
+    }
+  }, [authChecked, user, searchParams]);
+
+  const submitBooking = async () => {
+    if (!provider) return;
+    setBookingError("");
+
+    if (!selectedServiceId || !bookingDate) {
+      setBookingError("Please choose a service and a date.");
+      return;
+    }
+
+    try {
+      setBookingSubmitting(true);
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider_id: provider.provider_id,
+          service_id: Number(selectedServiceId),
+          booking_date: bookingDate,
+          house_details: houseDetails,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setBookingError(data.message || "Couldn't send your booking request.");
+        return;
+      }
+      setBookingSuccess(true);
+    } catch {
+      setBookingError("Something went wrong. Please try again.");
+    } finally {
+      setBookingSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -80,6 +155,8 @@ const ProviderDetailPage = () => {
     );
   }
 
+  const minDate = new Date().toISOString().split("T")[0];
+
   return (
     <div className="min-h-screen bg-[#f8faf3]">
       {/* Hero banner */}
@@ -103,10 +180,10 @@ const ProviderDetailPage = () => {
       </div>
 
       <div className="container mx-auto px-4 py-10">
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid items-stretch gap-8 lg:grid-cols-3">
           {/* Left — Profile card (read-only) */}
           <div className="lg:col-span-1">
-            <div className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.07)]">
+            <div className="h-full overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.07)]">
               <div className="relative h-56 bg-slate-100">
                 {provider.profile_picture ? (
                   <Image
@@ -195,8 +272,140 @@ const ProviderDetailPage = () => {
             </div>
           </div>
 
-          {/* Right — read-only overview (no edit controls, unlike the provider's own dashboard) */}
-          <div className="space-y-6 lg:col-span-2">
+          {/* Right — overview + booking */}
+          <div className="flex h-full flex-col gap-6 lg:col-span-2">
+            {/* Booking panel — content depends on auth state */}
+            <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-[0_8px_30px_rgba(15,23,42,0.07)]">
+              {!authChecked ? (
+                <div className="h-24 animate-pulse rounded-[1.5rem] bg-slate-50" />
+              ) : bookingSuccess ? (
+                <div className="flex flex-col items-center gap-3 py-4 text-center">
+                  <div className="text-4xl">✅</div>
+                  <h3 className="text-xl font-bold text-slate-950">Booking request sent!</h3>
+                  <p className="max-w-sm text-sm text-slate-500">
+                    {provider.full_name} will accept or decline it from their dashboard — you&apos;ll see
+                    the status update in your bookings.
+                  </p>
+                  <Link
+                    href="/customer/dashboard?tab=bookings"
+                    className="mt-2 rounded-full bg-[#0aa39a] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#089283]"
+                  >
+                    View My Bookings
+                  </Link>
+                </div>
+              ) : user?.role === "customer" ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold text-slate-950">Book This Provider</h3>
+                    {!showBookingForm && (
+                      <button
+                        onClick={() => setShowBookingForm(true)}
+                        className="rounded-full bg-[#0aa39a] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#089283]"
+                      >
+                        Book Now
+                      </button>
+                    )}
+                  </div>
+
+                  {showBookingForm && (
+                    <div className="mt-5 space-y-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-800">
+                          Service
+                        </label>
+                        <select
+                          value={selectedServiceId}
+                          onChange={(e) => setSelectedServiceId(e.target.value)}
+                          className="mt-2 w-full rounded-[1.5rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-[#0aa39a] focus:outline-none focus:ring-2 focus:ring-[#0aa39a]/10"
+                        >
+                          {provider.services.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {serviceIcons[s.name] ?? "🛠️"} {s.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-800">
+                          Preferred date
+                        </label>
+                        <div className="mt-2 relative">
+                          <CalendarDays
+                            size={16}
+                            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                          />
+                          <input
+                            type="date"
+                            min={minDate}
+                            value={bookingDate}
+                            onChange={(e) => setBookingDate(e.target.value)}
+                            className="w-full rounded-[1.5rem] border border-slate-200 bg-slate-50 px-4 py-3 pl-11 text-sm text-slate-900 focus:border-[#0aa39a] focus:outline-none focus:ring-2 focus:ring-[#0aa39a]/10"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-800">
+                          Address / job details
+                        </label>
+                        <textarea
+                          value={houseDetails}
+                          onChange={(e) => setHouseDetails(e.target.value)}
+                          rows={3}
+                          placeholder="House/flat number, area, and a short note about the job..."
+                          className="mt-2 w-full rounded-[1.5rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#0aa39a] focus:outline-none focus:ring-2 focus:ring-[#0aa39a]/10"
+                        />
+                      </div>
+
+                      {bookingError && (
+                        <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
+                          {bookingError}
+                        </div>
+                      )}
+
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setShowBookingForm(false)}
+                          className="flex-1 rounded-full border border-slate-200 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={submitBooking}
+                          disabled={bookingSubmitting}
+                          className="flex-1 rounded-full bg-[#0aa39a] py-3 text-sm font-semibold text-white transition hover:bg-[#089283] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {bookingSubmitting ? "Sending..." : "Send Booking Request"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : user?.role === "provider" ? (
+                <div className="flex items-center gap-3 rounded-[1.5rem] bg-slate-50 p-5 text-sm text-slate-600">
+                  <Lock size={18} className="shrink-0 text-slate-400" />
+                  Provider accounts can&apos;t book other providers. Log in as a customer to book.
+                </div>
+              ) : (
+                <div className="flex flex-col items-start gap-3 rounded-[1.5rem] bg-[#eaf7f6] p-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <Lock size={18} className="shrink-0 text-[#0aa39a]" />
+                    <p className="text-sm font-semibold text-slate-800">
+                      Log in as a customer to book {provider.full_name}.
+                    </p>
+                  </div>
+                  <Link
+                    href={`/login?redirect=${encodeURIComponent(`/providers/${provider.provider_id}?book=1`)}`}
+                    className="shrink-0 rounded-full bg-[#0aa39a] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#089283]"
+                  >
+                    Login to Book
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Profile overview */}
             <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-[0_8px_30px_rgba(15,23,42,0.07)]">
               <h3 className="mb-5 text-xl font-bold text-slate-950">Profile Overview</h3>
 
@@ -229,5 +438,11 @@ const ProviderDetailPage = () => {
     </div>
   );
 };
+
+const ProviderDetailPage = () => (
+  <Suspense fallback={null}>
+    <ProviderDetailContent />
+  </Suspense>
+);
 
 export default ProviderDetailPage;

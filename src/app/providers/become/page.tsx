@@ -230,13 +230,13 @@ const BecomeProviderPage: React.FC = () => {
         ========================================== */}
         <div className="mx-auto mt-14 max-w-4xl rounded-[2.5rem] bg-white p-10 shadow-[0_40px_120px_rgba(15,23,42,0.08)]">
 
-          <div className="grid items-start gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="grid items-stretch gap-8 lg:grid-cols-[0.9fr_1.1fr]">
 
 
             {/* =====================================
                 PROFILE PICTURE
             ====================================== */}
-            <div className="rounded-[2.25rem] bg-[#f5fcfb] p-6 text-center shadow-sm">
+            <div className="flex h-full flex-col rounded-[2.25rem] bg-[#f5fcfb] p-6 text-center shadow-sm">
 
               <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-[#0aa39a] to-[#109a8c] text-white shadow-xl">
 
@@ -279,7 +279,7 @@ const BecomeProviderPage: React.FC = () => {
                 PNG or JPG, up to 5MB.
               </p>
 
-              <label className="mt-6 inline-flex cursor-pointer items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50">
+              <label className="mx-auto mt-6 inline-flex cursor-pointer items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50">
 
                 {file ? file.name : "Choose file"}
 
@@ -291,6 +291,30 @@ const BecomeProviderPage: React.FC = () => {
                 />
 
               </label>
+
+              {/* Fills the empty space below the upload control with
+                  reasons to finish signing up — keeps the panel from
+                  looking unbalanced next to the taller form column. */}
+              <div className="mt-8 space-y-3 border-t border-[#0aa39a]/15 pt-6 text-left">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#0aa39a]">
+                  Why join ServiceHub
+                </p>
+
+                {[
+                  { icon: "👀", text: "Get discovered by thousands of nearby customers" },
+                  { icon: "💰", text: "Set your own rates — no hidden commissions" },
+                  { icon: "📅", text: "Keep your calendar full with steady bookings" },
+                  { icon: "✅", text: "Earn a verified badge after admin review" },
+                ].map((item) => (
+                  <div
+                    key={item.text}
+                    className="flex items-start gap-3 rounded-2xl bg-white/70 px-4 py-3 text-sm text-slate-700 shadow-sm"
+                  >
+                    <span className="text-base leading-none">{item.icon}</span>
+                    <span>{item.text}</span>
+                  </div>
+                ))}
+              </div>
 
             </div>
 

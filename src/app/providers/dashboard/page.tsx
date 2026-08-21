@@ -13,6 +13,10 @@ import {
   X,
   Save,
   Loader2,
+  Bell,
+  CalendarDays,
+  Check,
+  XCircle,
 } from "lucide-react";
 
 interface ProviderData {
@@ -29,6 +33,28 @@ interface ProviderData {
   profile_picture: string | null;
   services: { id: number; name: string }[];
 }
+
+type BookingStatus = "Pending" | "Accepted" | "Rejected" | "Completed";
+
+interface ProviderBooking {
+  id: number;
+  customer_id: number;
+  service_id: number;
+  booking_date: string;
+  house_details: string | null;
+  status: BookingStatus;
+  created_at: string;
+  customer_name: string;
+  customer_phone: string | null;
+  service_name: string;
+}
+
+const bookingStatusStyles: Record<BookingStatus, string> = {
+  Pending: "bg-amber-50 text-amber-700",
+  Accepted: "bg-blue-50 text-blue-700",
+  Completed: "bg-emerald-50 text-emerald-700",
+  Rejected: "bg-red-50 text-red-700",
+};
 
 const serviceIcons: Record<string, string> = {
   Electrician: "⚡",
@@ -68,6 +94,12 @@ const ProviderDashboard = () => {
   const [saveMsg, setSaveMsg] = useState("");
   const [saveError, setSaveError] = useState("");
 
+  // Booking requests state
+  const [bookings, setBookings] = useState<ProviderBooking[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
+  const [bookingActionId, setBookingActionId] = useState<number | null>(null);
+  const [bookingActionError, setBookingActionError] = useState("");
+
   // Auth guard
   useEffect(() => {
     fetch("/api/me")
@@ -101,6 +133,45 @@ const ProviderDashboard = () => {
   useEffect(() => {
     loadProvider();
   }, []);
+
+  // Load this provider's incoming booking requests — shown so they can
+  // accept or reject them right when they log in.
+  const loadBookings = () => {
+    return fetch("/api/bookings/provider")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setBookings(data?.data || []))
+      .catch(console.error)
+      .finally(() => setBookingsLoading(false));
+  };
+
+  useEffect(() => {
+    loadBookings();
+  }, []);
+
+  const handleBookingAction = async (bookingId: number, status: "Accepted" | "Rejected" | "Completed") => {
+    setBookingActionId(bookingId);
+    setBookingActionError("");
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setBookingActionError(data.message || "Couldn't update this booking.");
+        return;
+      }
+      await loadBookings();
+    } catch {
+      setBookingActionError("Something went wrong. Please try again.");
+    } finally {
+      setBookingActionId(null);
+    }
+  };
+
+  const pendingBookings = bookings.filter((b) => b.status === "Pending");
+  const otherBookings = bookings.filter((b) => b.status !== "Pending");
 
   // Load all available services
   useEffect(() => {
@@ -261,17 +332,119 @@ const ProviderDashboard = () => {
             </p>
           </div>
 
-          <button
-            onClick={openEdit}
-            className="inline-flex items-center gap-2 rounded-full bg-white/15 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/25"
-          >
-            <Edit3 size={16} />
-            Edit Profile
-          </button>
+          <div className="flex items-center gap-3">
+            {pendingBookings.length > 0 && (
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-3 text-sm font-semibold text-white">
+                <Bell size={16} />
+                {pendingBookings.length} new booking{pendingBookings.length !== 1 ? "s" : ""}
+              </div>
+            )}
+            <button
+              onClick={openEdit}
+              className="inline-flex items-center gap-2 rounded-full bg-white/15 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/25"
+            >
+              <Edit3 size={16} />
+              Edit Profile
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-10">
+        {/* ── Booking Requests — the "accept or reject when login" panel ── */}
+        <div className="mb-8 rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-[0_8px_30px_rgba(15,23,42,0.07)]">
+          <div className="mb-5 flex items-center justify-between">
+            <h3 className="text-xl font-bold text-slate-950">Booking Requests</h3>
+            {pendingBookings.length > 0 && (
+              <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                {pendingBookings.length} pending
+              </span>
+            )}
+          </div>
+
+          {bookingActionError && (
+            <div className="mb-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
+              {bookingActionError}
+            </div>
+          )}
+
+          {bookingsLoading ? (
+            <div className="flex justify-center py-10">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0aa39a] border-t-transparent" />
+            </div>
+          ) : bookings.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 rounded-[1.5rem] bg-slate-50 py-10 text-center">
+              <div className="text-3xl">📭</div>
+              <p className="text-sm font-semibold text-slate-600">No booking requests yet</p>
+              <p className="text-xs text-slate-400">
+                Requests from customers will show up here for you to accept or reject.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {[...pendingBookings, ...otherBookings].map((b) => (
+                <div
+                  key={b.id}
+                  className="flex flex-col gap-4 rounded-[1.5rem] border border-slate-100 bg-slate-50/60 p-5 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="font-bold text-slate-950">{b.customer_name}</p>
+                    <p className="text-sm text-slate-500">
+                      {serviceIcons[b.service_name] ?? "🛠️"} {b.service_name}
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
+                      <CalendarDays size={12} />
+                      {new Date(b.booking_date).toLocaleDateString()}
+                      {b.customer_phone ? ` · ${b.customer_phone}` : ""}
+                    </p>
+                    {b.house_details && (
+                      <p className="mt-1 max-w-md text-xs text-slate-500">{b.house_details}</p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {b.status === "Pending" ? (
+                      <>
+                        <button
+                          onClick={() => handleBookingAction(b.id, "Rejected")}
+                          disabled={bookingActionId === b.id}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:opacity-60"
+                        >
+                          <XCircle size={14} /> Reject
+                        </button>
+                        <button
+                          onClick={() => handleBookingAction(b.id, "Accepted")}
+                          disabled={bookingActionId === b.id}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-[#0aa39a] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#089283] disabled:opacity-60"
+                        >
+                          <Check size={14} /> Accept
+                        </button>
+                      </>
+                    ) : b.status === "Accepted" ? (
+                      <>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${bookingStatusStyles[b.status]}`}>
+                          {b.status}
+                        </span>
+                        <button
+                          onClick={() => handleBookingAction(b.id, "Completed")}
+                          disabled={bookingActionId === b.id}
+                          className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:opacity-60"
+                        >
+                          Mark Completed
+                        </button>
+                      </>
+                    ) : (
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${bookingStatusStyles[b.status]}`}>
+                        {b.status}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Left — Profile card */}
           <div className="lg:col-span-1">

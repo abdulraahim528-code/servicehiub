@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 
@@ -11,8 +11,9 @@ interface LoginFormValues {
   password: string;
 }
 
-const LoginPage = () => {
+const LoginForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { register, handleSubmit } = useForm<LoginFormValues>();
 
   const [loading, setLoading] = useState(false);
@@ -37,11 +38,16 @@ const LoginPage = () => {
         return;
       }
 
-      // Redirect based on role
-      if (result.user?.role === "provider") {
+      // If we were sent here to log in before booking (or any other deep link),
+      // honor that instead of the default dashboard.
+      const redirectTo = searchParams.get("redirect");
+
+      if (redirectTo && redirectTo.startsWith("/")) {
+        router.push(redirectTo);
+      } else if (result.user?.role === "provider") {
         router.push("/providers/dashboard");
       } else {
-        router.push("/dashboard");
+        router.push("/customer/dashboard");
       }
       router.refresh();
     } catch (err) {
@@ -105,7 +111,7 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <div className="h-full rounded-[2.5rem] bg-white p-10 shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
+          <div className="h-full flex flex-col justify-center rounded-[2.5rem] bg-white p-10 shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
             <div className="mb-6">
               <div className="inline-flex items-center rounded-full bg-[#eaf7ee] px-4 py-2 text-sm font-semibold text-[#0aa39a]">
                 Log in
@@ -204,5 +210,11 @@ const LoginPage = () => {
     </div>
   );
 };
+
+const LoginPage = () => (
+  <Suspense fallback={null}>
+    <LoginForm />
+  </Suspense>
+);
 
 export default LoginPage;
