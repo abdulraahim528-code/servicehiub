@@ -126,13 +126,7 @@ const Hero: React.FC = () => {
                 alt="Home services illustration"
                 className="h-[460px] w-full object-cover"
               />
-              <div className="absolute left-6 top-6 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm">
-                <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#0aa39a] mr-2" />
-                500+ Verified pros
-              </div>
-              <div className="absolute right-6 bottom-6 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm">
-                ⭐ 4.9 / 5 average rating
-              </div>
+            
             </div>
           </motion.div>
         </div>
