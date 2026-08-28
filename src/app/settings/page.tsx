@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { User, Phone, Lock, Save, Loader2, CheckCircle2 } from "lucide-react";
+import { User, Phone, Lock, Save, Loader2, CheckCircle2, Star } from "lucide-react";
 
 interface AuthUser {
   id: number;
@@ -31,6 +31,13 @@ const SettingsPage = () => {
   const [pwSaving, setPwSaving] = useState(false);
   const [pwMsg, setPwMsg] = useState("");
   const [pwError, setPwError] = useState("");
+
+  // Platform review fields — rate ServiceHub itself
+  const [platformRating, setPlatformRating] = useState(0);
+  const [platformComment, setPlatformComment] = useState("");
+  const [platformSaving, setPlatformSaving] = useState(false);
+  const [platformMsg, setPlatformMsg] = useState("");
+  const [platformError, setPlatformError] = useState("");
 
   // Auth guard
   useEffect(() => {
@@ -103,6 +110,30 @@ const SettingsPage = () => {
       setPwError("Something went wrong.");
     } finally {
       setPwSaving(false);
+    }
+  };
+
+  const handlePlatformReviewSave = async () => {
+    setPlatformMsg("");
+    setPlatformError("");
+    if (platformRating < 1) {
+      setPlatformError("Please select a star rating.");
+      return;
+    }
+    setPlatformSaving(true);
+    try {
+      const res = await fetch("/api/platform-reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating: platformRating, comment: platformComment }),
+      });
+      const data = await res.json();
+      if (!res.ok) setPlatformError(data.message || "Failed to submit your review.");
+      else setPlatformMsg("Thanks for your feedback!");
+    } catch {
+      setPlatformError("Something went wrong.");
+    } finally {
+      setPlatformSaving(false);
     }
   };
 
@@ -255,6 +286,70 @@ const SettingsPage = () => {
             >
               {pwSaving ? <Loader2 size={15} className="animate-spin" /> : <Lock size={15} />}
               {pwSaving ? "Changing..." : "Change Password"}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Rate ServiceHub section ── open to both customers and providers ── */}
+        <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-[0_8px_30px_rgba(15,23,42,0.07)]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fff3e2]">
+              <Star size={18} className="text-[#ff9b1f]" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">Rate ServiceHub</h2>
+              <p className="text-xs text-slate-500">Tell us what you think of the platform — this appears on our homepage.</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">Your rating</label>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setPlatformRating(star)}
+                    className="p-1"
+                    aria-label={`${star} star${star > 1 ? "s" : ""}`}
+                  >
+                    <Star
+                      size={26}
+                      className={star <= platformRating ? "fill-[#ff9b1f] text-[#ff9b1f]" : "text-slate-200"}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">Your feedback</label>
+              <textarea
+                value={platformComment}
+                onChange={(e) => setPlatformComment(e.target.value)}
+                rows={3}
+                placeholder="What's your experience with ServiceHub been like?"
+                className="w-full rounded-[1.5rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-[#0aa39a] focus:outline-none focus:ring-2 focus:ring-[#0aa39a]/10"
+              />
+            </div>
+
+            {platformMsg && (
+              <div className="flex items-center gap-2 rounded-2xl bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+                <CheckCircle2 size={16} /> {platformMsg}
+              </div>
+            )}
+            {platformError && (
+              <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{platformError}</div>
+            )}
+
+            <button
+              onClick={handlePlatformReviewSave}
+              disabled={platformSaving}
+              className="inline-flex items-center gap-2 rounded-full bg-[#ff9b1f] px-7 py-3 text-sm font-semibold text-[#693500] shadow-md transition hover:bg-[#ffb35a] disabled:opacity-60"
+            >
+              {platformSaving ? <Loader2 size={15} className="animate-spin" /> : <Star size={15} />}
+              {platformSaving ? "Submitting..." : "Submit Review"}
             </button>
           </div>
         </div>

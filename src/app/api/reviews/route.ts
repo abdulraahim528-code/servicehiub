@@ -8,6 +8,52 @@ interface ExistingReviewRow extends RowDataPacket {
   id: number;
 }
 
+interface PublicReviewRow extends RowDataPacket {
+  id: number;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  customer_name: string;
+  provider_name: string;
+  service_name: string | null;
+}
+
+// ─── GET /api/reviews ─── public feed of real customer reviews, used for
+// the homepage testimonials section. Only reviews that include written
+// feedback are returned so the cards always have something to display.
+export async function GET(req: NextRequest) {
+  try {
+    const limitParam = Number(req.nextUrl.searchParams.get("limit"));
+    const limit = Number.isInteger(limitParam) && limitParam > 0 ? Math.min(limitParam, 100) : 50;
+
+    const [rows] = await pool.query<PublicReviewRow[]>(
+      `SELECT r.id, r.rating, r.comment, r.created_at,
+              cu.full_name AS customer_name,
+              pu.full_name AS provider_name,
+              MIN(s.name) AS service_name
+       FROM reviews r
+       JOIN users cu ON cu.id = r.customer_id
+       JOIN providers p ON p.id = r.provider_id
+       JOIN users pu ON pu.id = p.user_id
+       LEFT JOIN provider_services ps ON ps.provider_id = p.id
+       LEFT JOIN services s ON s.id = ps.service_id
+       WHERE r.comment IS NOT NULL AND TRIM(r.comment) <> ''
+       GROUP BY r.id, r.rating, r.comment, r.created_at, cu.full_name, pu.full_name
+       ORDER BY r.rating DESC, r.created_at DESC
+       LIMIT ?`,
+      [limit]
+    );
+
+    return NextResponse.json({ success: true, data: rows });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { success: false, message: "Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
 // ─── POST /api/reviews ─── customer rates a provider for a Completed booking
 // body: { bookingId, rating (1-5), comment? }
 export async function POST(req: NextRequest) {

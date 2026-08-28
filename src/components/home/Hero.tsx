@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { fetchJson } from '@/lib/fetchJson';
 
 const CountUp: React.FC<{ target: number; suffix?: string; label: string }> = ({ target, suffix = '', label }) => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -56,6 +57,14 @@ const CountUp: React.FC<{ target: number; suffix?: string; label: string }> = ({
   );
 };
 
+interface PlatformStats {
+  customers: number;
+  providers: number;
+  categories: number;
+  cities: number;
+  reviews: number;
+}
+
 const Hero: React.FC = () => {
   const highlights = [
     { label: 'Verified Providers', icon: '✓' },
@@ -63,12 +72,14 @@ const Hero: React.FC = () => {
     { label: 'Fast Response', icon: '⚡' },
   ];
 
-  const stats = [
-    { value: '10,000+', label: 'Happy Customers' },
-    { value: '500+', label: 'Verified Providers' },
-    { value: '8+', label: 'Service Categories' },
-    { value: '99%', label: 'Customer Satisfaction' },
-  ];
+  // Live counts pulled from the database — replaces the old hardcoded numbers.
+  const [stats, setStats] = useState<PlatformStats | null>(null);
+
+  useEffect(() => {
+    fetchJson<{ success: boolean; data: PlatformStats }>('/api/stats').then((json) => {
+      if (json?.success) setStats(json.data);
+    });
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-[linear-gradient(120deg,_#e8f4eb_0%,_#f8f0dc_45%,_#fff7ef_100%)] py-16 lg:py-24">
@@ -131,11 +142,10 @@ const Hero: React.FC = () => {
           </motion.div>
         </div>
 
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:max-w-6xl xl:mx-auto">
-          <CountUp target={10000} suffix="+" label="Happy Customers" />
-          <CountUp target={500} suffix="+" label="Verified Providers" />
-          <CountUp target={8} suffix="+" label="Service Categories" />
-          <CountUp target={99} suffix="%" label="Customer Satisfaction" />
+        <div className="mt-10 grid gap-3 sm:grid-cols-3 xl:max-w-5xl xl:mx-auto">
+          <CountUp target={stats?.customers ?? 0} suffix="+" label="Happy Customers" />
+          <CountUp target={stats?.providers ?? 0} suffix="+" label="Verified Providers" />
+          <CountUp target={stats?.categories ?? 0} suffix="+" label="Service Categories" />
         </div>
       </div>
     </section>

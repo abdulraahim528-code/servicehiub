@@ -1,34 +1,34 @@
+"use client";
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, Eye, Heart, Rocket, Target } from 'lucide-react';
+import { fetchJson } from '@/lib/fetchJson';
+
+interface PlatformStats {
+  customers: number;
+  providers: number;
+  categories: number;
+  cities: number;
+  reviews: number;
+}
 
 const team = [
   {
-    name: 'Amara Osei',
+    name: 'Usman Talib',
     role: 'Co-founder & CEO',
-    image: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=720&q=85',
+    image: '/images/profile.png',
   },
   {
-    name: 'Vikram Rao',
+    name: 'Abdul Rahim',
     role: 'Co-founder & CTO',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=720&q=85',
+    image: '/images/profile.png',
   },
   {
-    name: 'Julia Meyer',
+    name: 'Aila Malik',
     role: 'Head of Trust & Safety',
-    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=720&q=85',
+    image: '/images/profile.png',
   },
-  {
-    name: 'Tom Alvarez',
-    role: 'Head of Provider Success',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=720&q=85',
-  },
-];
-
-const stats = [
-  ['10,000+', 'Happy Customers'],
-  ['500+', 'Verified Providers'],
-  ['120+', 'Cities Served'],
-  ['99%', 'Satisfaction Rate'],
 ];
 
 const Pill = ({ children }: { children: React.ReactNode }) => (
@@ -38,6 +38,21 @@ const Pill = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function AboutPage() {
+  // Live counts pulled from the database — replaces the old hardcoded numbers.
+  const [stats, setStats] = useState<PlatformStats | null>(null);
+
+  useEffect(() => {
+    fetchJson<{ success: boolean; data: PlatformStats }>('/api/stats').then((json) => {
+      if (json?.success) setStats(json.data);
+    });
+  }, []);
+
+  const statCards: [string, string][] = [
+    [stats ? `${stats.customers}+` : '...', 'Happy Customers'],
+    [stats ? `${stats.providers}+` : '...', 'Verified Providers'],
+    [stats ? `${stats.cities}+` : '...', 'Cities Served'],
+  ];
+
   return (
     <div className="overflow-hidden bg-[#f7faf9] text-[#163b3a]">
       <section className="bg-[linear-gradient(100deg,#edf8f5_0%,#f7fbfa_52%,#fff4dc_100%)] px-5 pb-14 pt-20 sm:pb-20 sm:pt-24">
@@ -86,8 +101,8 @@ export default function AboutPage() {
 
       <section className="px-5 py-14 sm:py-16">
         <div className="mx-auto max-w-6xl rounded-[22px] border border-[#d7ebe6] bg-white px-5 py-5 shadow-[0_14px_28px_rgba(7,135,127,0.10)] sm:px-8 sm:py-6">
-          <div className="grid grid-cols-2 gap-y-6 md:grid-cols-4">
-            {stats.map(([value, label]) => <div key={label} className="text-center"><p className="text-2xl font-extrabold text-[#07877f] sm:text-3xl">{value}</p><p className="mt-1 text-xs text-[#52716e]">{label}</p></div>)}
+          <div className="grid grid-cols-3 gap-y-6">
+            {statCards.map(([value, label]) => <div key={label} className="text-center"><p className="text-2xl font-extrabold text-[#07877f] sm:text-3xl">{value}</p><p className="mt-1 text-xs text-[#52716e]">{label}</p></div>)}
           </div>
         </div>
       </section>
@@ -96,10 +111,10 @@ export default function AboutPage() {
         <div className="mx-auto max-w-6xl text-center">
           <Pill><BadgeCheck size={12} strokeWidth={2.2} /> Our Team</Pill>
           <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-[#0b5f5b] sm:text-4xl">The people behind ServiceHub</h2>
-          <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
             {team.map((member) => (
               <article key={member.name} className="overflow-hidden rounded-[18px] border border-[#d7ebe6] bg-white shadow-[0_8px_16px_rgba(7,135,127,0.10)]">
-                <img src={member.image} alt={member.name} className="h-44 w-full object-cover" />
+                <img src={member.image} alt={member.name} className="h-64 w-full object-cover" />
                 <div className="px-4 py-4"><h3 className="text-sm font-bold text-[#0b5f5b]">{member.name}</h3><p className="mt-1 text-xs text-[#52716e]">{member.role}</p></div>
               </article>
             ))}
